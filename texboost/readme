@@ -1,0 +1,12 @@
+ 
+para correr estre programa devem correr-se os seguintes comandos em linux, em windows google it(how to setup virtualenv/pip ) xb
+
+mkdir venv
+
+virtualenv -p3 venv/
+pip -r requirements.txt
+
+source venv/bin/activate
+python main.py
+
+
