@@ -35,7 +35,7 @@ class dds_gen:
             phi += IncPhase
             if phi > N-1:
                 phi = phi - N
-        self.iniPhase = phi
+        self.IniPhase = phi
         return x
     
     def gen_threaded(self, f0, NumSamp,q):

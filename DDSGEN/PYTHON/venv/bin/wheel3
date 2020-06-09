@@ -1,4 +1,4 @@
-#!/home/duarte/Nextcloud/radar/waveformGEN/PYTHON/venv/bin/python
+#!/home/duarte/Nextcloud/Bolsa/BIL/TexBoostSRC/DDSGEN/PYTHON/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

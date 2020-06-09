@@ -46,7 +46,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV='/home/duarte/Nextcloud/radar/waveformGEN/PYTHON/venv'
+VIRTUAL_ENV='/home/duarte/Nextcloud/Bolsa/BIL/TexBoostSRC/DDSGEN/PYTHON/venv'
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

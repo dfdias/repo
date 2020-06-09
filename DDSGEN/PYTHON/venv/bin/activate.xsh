@@ -28,7 +28,7 @@ def _deactivate(args):
 _deactivate(["nondestructive"])
 aliases["deactivate"] = _deactivate
 
-$VIRTUAL_ENV = r"/home/duarte/Nextcloud/radar/waveformGEN/PYTHON/venv"
+$VIRTUAL_ENV = r"/home/duarte/Nextcloud/Bolsa/BIL/TexBoostSRC/DDSGEN/PYTHON/venv"
 
 $_OLD_VIRTUAL_PATH = $PATH
 $PATH = $PATH[:]
