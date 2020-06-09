@@ -25,7 +25,7 @@ class dds_gen:
         N = self.N
     
         #asserts that the ratio is a rational number
-        x = np.zeros(NumSamp)
+        x = np.zeros(NumSamp-1)
         sintable = self.sintable
         IncPhase = (f0/self.fs)*N 
         n = 0;
@@ -36,7 +36,7 @@ class dds_gen:
             if phi > N-1:
                 phi = phi - N
         self.IniPhase = phi
-        return x[0:NumSamp-1]
+        return x
     
     def gen_threaded(self, f0, NumSamp,q):
         while(1):
