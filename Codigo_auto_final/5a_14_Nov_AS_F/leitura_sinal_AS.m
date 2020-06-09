@@ -1,14 +1,14 @@
-%% Carolina Gouveia - 27 MarÁo 2020
-% Teste do mÈtodo de automatizaÁ„o do cÛdigo
+%% Carolina Gouveia - 27 MarÔøΩo 2020
+% Teste do mÔøΩtodo de automatizaÔøΩÔøΩo do cÔøΩdigo
 
 clear all; clc; close all
-fa = 100e3;   %frequÍncia de amostragem da aquisiÁ„o em LabView
+fa = 100e3;   %frequÔøΩncia de amostragem da aquisiÔøΩÔøΩo em LabView
 
-%% DescriÁ„o dos sinais
+%% DescriÔøΩÔøΩo dos sinais
 % Sinais adquiridos durante a experiencia PsyLAB, segunda ronda, AS_F
 
 %% Flags debug
-db_debug = 0;       % Para executar o codigo de automatizaÁ„o em modo debug (ver os plots passo a passo)
+db_debug = 0;       % Para executar o codigo de automatizaÔøΩÔøΩo em modo debug (ver os plots passo a passo)
 
 %% Leitura do sinal
 n = 1;
@@ -23,10 +23,13 @@ num_sinais = 7;
 %% Ver o sinal complexo inicial?
 % figure; polarplot(angle(s18), abs(s18));
 %%
-%% Circle fit e remoÁ„o da componente DC
-I_DC = ones(num_sinais,length(real(s18)));
-Q_DC = ones(num_sinais,length(imag(s18)));
-xD_DC = ones(num_sinais,length(s18));
+%% Circle fit e remoÔøΩÔøΩo da componente DC
+I_DC = ones(num_sinais,length(real(s18)));%isto √© idiota
+Q_DC = ones(num_sinais,length(imag(s18)));%same
+xD_DC = ones(num_sinais,length(s18)); %mais razo√°vel?
+%usar uma vari√°vel apenas _> estou a calcular duas ou tr√äS VEZES A MESMA COISA
+%%ir √† mem√≥ria √© mais r√°pido do que fazer len*3*2 opera√ß√µes aritem√©ticas
+
 
 for k=1:num_sinais
     XRt = S(k).sinal;
@@ -36,8 +39,8 @@ for k=1:num_sinais
     xD_DC(k,:) = I_DC(k,:)+(1i*Q_DC(k,:));
 end
 
-%% Verificar mÈtodo
-xD_DC_rot3 = ones(num_sinais,length(s18));
+%% Verificar mÔøΩtodo
+xD_DC_rot3 = ones(num_sinais,length(s18));%again?
 
 for k = 1:num_sinais
     [xD_DC_rot3(k,:), freq_pwelch] = arc_correct7(xD_DC(k,:), db_debug);
