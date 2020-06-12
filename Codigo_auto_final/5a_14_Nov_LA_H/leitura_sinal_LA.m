@@ -1,14 +1,14 @@
-%% Carolina Gouveia - 23 Março 2020
-% Teste do terceiro método de automatização do código
-
+%% Carolina Gouveia - 23 Marï¿½o 2020
+% Teste do terceiro mï¿½todo de automatizaï¿½ï¿½o do cï¿½digo
 clear all; clc; close all
-fa = 100e3;   %frequência de amostragem da aquisição em LabView
+tic
+fa = 100e3;   %frequï¿½ncia de amostragem da aquisiï¿½ï¿½o em LabView
 
-%% Descrição dos sinais
+%% Descriï¿½ï¿½o dos sinais
 % Sinais adquiridos durante a experiencia PsyLAB, segunda ronda, LA_H
 
 %% Flags debug
-db_debug = 0;       % Para executar o codigo de automatização em modo debug (ver os plots passo a passo)
+db_debug = 0;       % Para executar o codigo de automatizaï¿½ï¿½o em modo debug (ver os plots passo a passo)
 
 %% Leitura do sinal
 n = 1;
@@ -19,16 +19,16 @@ for k=18:25
 end
 s18 = S(1).sinal;
 num_sinais = 8;
+len = length(s18)
 
 %% Ver o sinal complexo inicial?
 % figure; polarplot(angle(s18), abs(s18));
 %%
 
-%% Circle fit e remoção da componente DC
-I_DC = ones(num_sinais,length(real(s18)));
-Q_DC = ones(num_sinais,length(imag(s18)));
-xD_DC = ones(num_sinais,length(s18));
-
+%% Circle fit e remoï¿½ï¿½o da componente DC
+I_DC  = ones(num_sinais,len);
+Q_DC  = ones(num_sinais,len);
+xD_DC = ones(num_sinais,len);
 for k=1:num_sinais
     XRt = S(k).sinal;
     [xc(k),yc(k),Re,a] = circfit(real(XRt),imag(XRt));
@@ -37,7 +37,7 @@ for k=1:num_sinais
     xD_DC(k,:) = I_DC(k,:)+(1i*Q_DC(k,:));
 end
 
-%% Verificar método
+%% Verificar mï¿½todo
 xD_DC_rot3 = ones(num_sinais,length(s18));
 
 for k = 1:num_sinais
@@ -60,4 +60,4 @@ end
 %% Ver o sinal complexo final?
 %figure; polarplot(angle(xD_DC_rot3(6,:)),abs(xD_DC_rot3(6,:)))
 %%
-   
+toc  

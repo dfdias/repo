@@ -9,7 +9,7 @@ fa = 100e3;   %frequ�ncia de amostragem da aquisi��o em LabView
 
 %% Flags debug
 db_debug = 0;       % Para executar o codigo de automatiza��o em modo debug (ver os plots passo a passo)
-
+tic
 %% Leitura do sinal
 n = 1;
 for k=19:25
@@ -19,28 +19,27 @@ for k=19:25
 end
 s18 = S(1).sinal;
 num_sinais = 7;
-
+len = length(s18)
 %% Ver o sinal complexo inicial?
 % figure; polarplot(angle(s18), abs(s18));
 %%
 %% Circle fit e remo��o da componente DC
-I_DC = ones(num_sinais,length(real(s18)));%isto é idiota
-Q_DC = ones(num_sinais,length(imag(s18)));%same
-xD_DC = ones(num_sinais,length(s18)); %mais razoável?
-%usar uma variável apenas _> estou a calcular duas ou trÊS VEZES A MESMA COISA
-%%ir à memória é mais rápido do que fazer len*3*2 operações ariteméticas
-
+I_DC  = ones(num_sinais,len);
+Q_DC  = ones(num_sinais,len);
+xD_DC = ones(num_sinais,len);
 
 for k=1:num_sinais
     XRt = S(k).sinal;
-    [xc(k),yc(k),Re,a] = circfit(real(XRt),imag(XRt));
-    I_DC(k,:) = real(XRt)-xc(k);
-    Q_DC(k,:) = imag(XRt)-yc(k);
+    realXRt = real(XRt);%loading once inproves runtime
+    imagXRt = imag(XRt);
+    [xc(k),yc(k),Re,a] = circfit(realXRt,imagXRt);
+    I_DC(k,:) = realXRt-xc(k);
+    Q_DC(k,:) = imagXRt-yc(k);
     xD_DC(k,:) = I_DC(k,:)+(1i*Q_DC(k,:));
 end
 
 %% Verificar m�todo
-xD_DC_rot3 = ones(num_sinais,length(s18));%again?
+xD_DC_rot3 = ones(num_sinais,len);%again?
 
 for k = 1:num_sinais
     [xD_DC_rot3(k,:), freq_pwelch] = arc_correct7(xD_DC(k,:), db_debug);
@@ -50,7 +49,7 @@ for k = 1:num_sinais
     t_R = (0:length(xD_DC_rot3(k,:))-1)*(1/fa2);
     
     phase3 = angle(phase_f10_R3);
-    
+
     figure;
     hT3 = plot(t_R,phase3,'b');
     axis([1 t_R(end) -2.5 2.5])
@@ -62,4 +61,4 @@ end
 %% Ver o sinal complexo final?
 %figure; polarplot(angle(xD_DC_rot3(6,:)),abs(xD_DC_rot3(6,:)))
 %%
-   
+toc
