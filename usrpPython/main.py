@@ -23,10 +23,7 @@ def rx(usrp, rx_streamer):
     print("buffersamps",buffer_samps)
     num_samps = buffer_samps
     result = np.empty((num_channels,buffer_samps),dtype=np.complex64)
-    
     metadata = uhd.types.RXMetadata()
-    
-   
     recv_buffer = np.zeros(
             (num_channels, buffer_samps), dtype=np.complex64)
     recv_samps = 0

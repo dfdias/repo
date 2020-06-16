@@ -1,76 +1,76 @@
 function [xD_DC_rot, freq] = arc_correct6(xD_DC, debug)
-%% Implementação da correção do arco automática com o método 1 com EXTRA
-%% Descrição Método 3 (versão 6):
-% Com método 3 o objetivo é rodar de maneira que a parte interior concava
-% fique virada para a origem e á volta dos 0º. Ou seja, o arco deve de
-% ocupar o 1º e 4º Quadrante. Assim garantimos que o movimento é recuperado
+%% Implementaï¿½ï¿½o da correï¿½ï¿½o do arco automï¿½tica com o mï¿½todo 1 com EXTRA
+%% Descriï¿½ï¿½o Mï¿½todo 3 (versï¿½o 6):
+% Com mï¿½todo 3 o objetivo ï¿½ rodar de maneira que a parte interior concava
+% fique virada para a origem e ï¿½ volta dos 0ï¿½. Ou seja, o arco deve de
+% ocupar o 1ï¿½ e 4ï¿½ Quadrante. Assim garantimos que o movimento ï¿½ recuperado
 % como deve de ser.
 
 % FASE 1:
-% 1- Condição QQ: Enquanto houverem samples após +- 135º 2º e 3º quadrante,
-% significa que o arco ainda não rodou completamente para o
-% 1º e 4º quadrante.
-%       1.1- Vamos rodando o arco pi/5 em pi/5 até que não se verifique a
-%       condição QQ
-%       1.2- Se já tivermos dado um total de 10 voltas, significa que o
-%       arco já deu uma volta completa. Tem amostras demasiado dispersas e
+% 1- Condiï¿½ï¿½o QQ: Enquanto houverem samples apï¿½s +- 135ï¿½ 2ï¿½ e 3ï¿½ quadrante,
+% significa que o arco ainda nï¿½o rodou completamente para o
+% 1ï¿½ e 4ï¿½ quadrante.
+%       1.1- Vamos rodando o arco pi/5 em pi/5 atï¿½ que nï¿½o se verifique a
+%       condiï¿½ï¿½o QQ
+%       1.2- Se jï¿½ tivermos dado um total de 10 voltas, significa que o
+%       arco jï¿½ deu uma volta completa. Tem amostras demasiado dispersas e
 %       portanto tem que ser acrescentado um offset
 % FASE 2:
-% 2- Como na fase anterior o sinal voltou ao mesmo sitio, é necessário
-% roda-lo de forma a que fique à volta dos 0º de preferencia com a
+% 2- Como na fase anterior o sinal voltou ao mesmo sitio, ï¿½ necessï¿½rio
+% roda-lo de forma a que fique ï¿½ volta dos 0ï¿½ de preferencia com a
 % concavidade interior voltada para a origem. Assumindo que o sinal no eixo
-% y tem um comprimento superior ao eixo x, quando está na posição desejada,
+% y tem um comprimento superior ao eixo x, quando estï¿½ na posiï¿½ï¿½o desejada,
 % calculam-se os valores max e min de cada eixo.
-%       2.1 - Com esses valores min e max são definidas 3 condições. O arco
-%       é rodado de pi/5 em pi/5 enquanto essas condições não se
+%       2.1 - Com esses valores min e max sï¿½o definidas 3 condiï¿½ï¿½es. O arco
+%       ï¿½ rodado de pi/5 em pi/5 enquanto essas condiï¿½ï¿½es nï¿½o se
 %       verificarem.
 %           2.1.1 - Cond1 - a X width < 0.01
 %           2.1.2 - Cond2 - a X width < Y width
-%           2.1.3 - É calculado um fit do arco a uma parábola. Temos a
-%       concavidade voltada para dentro quando o elemento quadrático da
-%       parábola encontrada for negativo.
-%       2.2 - Caso não seja possivel com as condições definidas em 2.1
-%       rodar o arco para a posição certa, aumentamos a largura admissivel
-%       de X width para 0.03. Senão, passa para a adição de offset.
+%           2.1.3 - ï¿½ calculado um fit do arco a uma parï¿½bola. Temos a
+%       concavidade voltada para dentro quando o elemento quadrï¿½tico da
+%       parï¿½bola encontrada for negativo.
+%       2.2 - Caso nï¿½o seja possivel com as condiï¿½ï¿½es definidas em 2.1
+%       rodar o arco para a posiï¿½ï¿½o certa, aumentamos a largura admissivel
+%       de X width para 0.03. Senï¿½o, passa para a adiï¿½ï¿½o de offset.
 % FASE 3:
-% 3- Acrescentar offset. O offset começa por ser inicializado a um valor
-% baixo que é incrementado o necessário. A condição limite é até termos
-% Xmin negativo. O offset só é acrescentado na parte real.
-%       3.1 - No final do offset a condição QQ e verifiada outra vez, para
+% 3- Acrescentar offset. O offset comeï¿½a por ser inicializado a um valor
+% baixo que ï¿½ incrementado o necessï¿½rio. A condiï¿½ï¿½o limite ï¿½ atï¿½ termos
+% Xmin negativo. O offset sï¿½ ï¿½ acrescentado na parte real.
+%       3.1 - No final do offset a condiï¿½ï¿½o QQ e verifiada outra vez, para
 %       poder sair desse ciclo.
 % FASE 4:
-% 4- Calculamos a frequencia do sinal respiratório extraído.
-%       4.1 - Como o sinal não está exatamente centrado em zero, é
-%       necessário remover a componente média, para que o pico detetado não
+% 4- Calculamos a frequencia do sinal respiratï¿½rio extraï¿½do.
+%       4.1 - Como o sinal nï¿½o estï¿½ exatamente centrado em zero, ï¿½
+%       necessï¿½rio remover a componente mï¿½dia, para que o pico detetado nï¿½o
 %       seja DC, mas sim o pico de interesse. Portanto, o sinal usado para
-%       a avaliação espetral é resp = angle(sfinal) - mean(angle(sfinal));
-%       4.2 - Para calcular a freq é usado o método WELCH com uma
-%       interpolação de fator 10.
-%       4.3 - Quando o sinal under test altera abruptamente a sua média, o
-%       primeiro pico detetado é mais uma vez a média. Nesse caso
+%       a avaliaï¿½ï¿½o espetral ï¿½ resp = angle(sfinal) - mean(angle(sfinal));
+%       4.2 - Para calcular a freq ï¿½ usado o mï¿½todo WELCH com uma
+%       interpolaï¿½ï¿½o de fator 10.
+%       4.3 - Quando o sinal under test altera abruptamente a sua mï¿½dia, o
+%       primeiro pico detetado ï¿½ mais uma vez a mï¿½dia. Nesse caso
 %       considera-se o segundo pico detetado.
-%       4.4 - O método welch não tem precisão suficiente para frequencas
-%       muito baixas (abaixo dos 0.15 Hz). Nesse caso é usada a FFT normal.
+%       4.4 - O mï¿½todo welch nï¿½o tem precisï¿½o suficiente para frequencas
+%       muito baixas (abaixo dos 0.15 Hz). Nesse caso ï¿½ usada a FFT normal.
 
-%% Variáveis
+%% Variï¿½veis
 % Input - xD_DC - sinal complexo sem componente DC
 %       - debug - Se '1' ativar o modo debug para ver cada plot em cada
-%       iteração. Se '0', desativar o modo debug. Se diferente de '1' ou
+%       iteraï¿½ï¿½o. Se '0', desativar o modo debug. Se diferente de '1' ou
 %       '0', gerar erro de input.
-%       - debug_rot - Se '0' usa o numero de voltas default que são 7
-%       Se > 0, a seguir às 10 voltas dá N voltas, sendo N = debug_rot;
-% Output - xD_DC_rot - sinal compensado com rotação e eventualmente offset
-%        - freq_pwelch - devolve a frequência respiratória
+%       - debug_rot - Se '0' usa o numero de voltas default que sï¿½o 7
+%       Se > 0, a seguir ï¿½s 10 voltas dï¿½ N voltas, sendo N = debug_rot;
+% Output - xD_DC_rot - sinal compensado com rotaï¿½ï¿½o e eventualmente offset
+%        - freq_pwelch - devolve a frequï¿½ncia respiratï¿½ria
 
-%% Codigo da função
-% Verifica o nº de inputs
+%% Codigo da funï¿½ï¿½o
+% Verifica o nï¿½ de inputs
 if nargin < 2
     error('Not enough inputs')
 elseif nargin > 2
     error('Too many inputs')
 elseif nargin == 2
 
-    % Verificação do modo debug
+    % Verificaï¿½ï¿½o do modo debug
     if debug == 1
         db_debug = 1;
     elseif debug == 0
@@ -79,23 +79,28 @@ elseif nargin == 2
         error('Please insert 0 or 1')
     end
 %% FASE 1    
-    xD_DC_rot = xD_DC;                              % Inicilizar a variavel xD_DC_rot com o sinal complexo no input
-    Q = angle(xD_DC_rot);                           % Calcula condição QQ inicial
+    xD_DC_rot = xD_DC;
+    Q = angle(xD_DC_rot);                           % Calcula condiï¿½ï¿½o QQ inicial
     rad = 6*pi/8;                                  
-    R = find(Q > rad | Q < - rad);                  % Define a condição QQ
+    R = find(Q > rad | Q < - rad);                  % Define a condiï¿½ï¿½o QQ
     qq1 = 0;                                        % Inicializa o contador de voltas
     
-    while ~isempty(R)                               % Quando 'R' for um array vazio, pára de rodar
+    while ~isempty(R)                               % Quando 'R' for um array vazio, pÃ¡ra de rodar
         % Roda
         aux = exp(-1j*(pi/5));                      % Sinal auxilixar para rodar
-        xD_DC_rot = aux*xD_DC_rot;                  % Roda pi/5
+        xD_DC_rot = aux*xD_DC_rot; % Inicilizar a variavel xD_DC_rot com o sinal complexo no input
+        xD_DC_rot_i = imag(xD_DC_rot);
+        xD_DC_rot_r = real(xD_DC_rot);
+  
         Q = angle(xD_DC_rot);                       
-        R = find(Q > rad | Q < - rad);              % Atualiza a condição QQ
+       
+        % Roda pi/5                       
+        R = find(Q > rad | Q < - rad);              % Atualiza a condiÃ§Ã£o QQ
         qq1 = qq1+1;                                % Incrementa volta
         
-        % Debug 1 - verificar se o arco dá a volta completa
+        % Debug 1 - verificar se o arco dï¿½ a volta completa
         if db_debug
-            polarplot(angle(xD_DC_rot),abs(xD_DC_rot))
+            polarplot(angle(xD_DC_rot)),abs(xD_DC_rot))
             pause;                                  % Em cada ciclo
         end
         
@@ -106,16 +111,17 @@ elseif nargin == 2
             end
 %% FASE 2            
             % Cacula X e Y lim
-            ylim_min = min(imag(xD_DC_rot));        % Calcula ymin
-            ylim_max = max(imag(xD_DC_rot));        % Calcula ymax
+            ylim_min = min(xD_DC_rot_i);        % Calcula ymin
+            ylim_max = max(xD_DC_rot_i);        % Calcula ymax
             Ywidth = ylim_max - ylim_min;           % Calcula Ywidth
             
-            xlim_min = min(real(xD_DC_rot));        % Calcula xmin
-            xlim_max = max(real(xD_DC_rot));        % Calcula xmax
+            xlim_min = min(xD_DC_rot_r);        % Calcula xmin
+            xlim_max = max(xD_DC_rot_r);        % Calcula xmax
             Xwidth = xlim_max - xlim_min;           % Calcula Xwidth
 
-            % Análise da concavidade
-            f = fit(real(xD_DC_rot)', imag(xD_DC_rot)', 'poly2');   % Faz fit ao arco
+            % Anï¿½lise da concavidade
+            %f = fit(real(xD_DC_rot_r', imag(xD_DC_rot)', 'poly2');   % Faz fit ao arco
+            f = fit(xD_DC_rot_r', xD_DC_rot_i', 'poly2');
             coeffvals= coeffvalues(f);              % Vai buscar os coeficientes do polinomio de grau 2
             coeffvals = coeffvals(1);
             % Debug 2 - verificar os XY lim e coeficiente 1
@@ -125,30 +131,33 @@ elseif nargin == 2
                 fprintf('Coef = %0.5f \n', coeffvals);
             end
             
-            flag = 0;                               % Flag repitição FASE 2
+            flag = 0;                               % Flag repitiï¿½ï¿½o FASE 2
             qq3 = 0;                                % Inicializa contador de voltas
             cond1 = Xwidth > 0.01;                  % Define cond1
             bool = 1;
             cond2 = bool;
                 
             cond3 = Ywidth < Xwidth;                % Define cond3
-            fprintf('stage2\n');          
-            
-            while cond1 | cond3 | cond2             % Enquanto se verificarem as condições
+            fprintf('stage2\n');  % as 8, 9 ou 10 de julhoond2             % Enquanto se verificarem as condiï¿½ï¿½es
+            while cond1 | cond3 | cond2             % Enquanto se verificarem as condiï¿½ï¿½es
 
                 aux = exp(-1j*(pi/5));              % Sinal auxilixar para rodar
                 xD_DC_rot = aux*xD_DC_rot;          % Roda pi/5
-                
+                xD_DC_rot_i = imag(xD_DC_rot);
+                xD_DC_rot_r = real(xD_DC_rot);
+                %xD_DC_rot_ang = angle(xD_DC_rot); 
+                %xD_DC_rot_abs = abs(xD_DC_rot);        
                 % Atualiza XY lim e coef
-                ylim_min = min(imag(xD_DC_rot));
-                ylim_max = max(imag(xD_DC_rot));
-                Ywidth = ylim_max - ylim_min;
-                
-                xlim_min = min(real(xD_DC_rot));
-                xlim_max = max(real(xD_DC_rot));
-                Xwidth = xlim_max - xlim_min;
+                 % Cacula X e Y lim
+                ylim_min = min(xD_DC_rot_i);        % Calcula ymin
+                ylim_max = max(xD_DC_rot_i);        % Calcula ymax
+                Ywidth = ylim_max - ylim_min;           % Calcula Ywidth
+            
+                xlim_min = min(xD_DC_rot_r);        % Calcula xmin
+                xlim_max = max(xD_DC_rot_r);        % Calcula xmax
+                Xwidth = xlim_max - xlim_min;           % Calcula Xwidth
 
-                f = fit(real(xD_DC_rot)', imag(xD_DC_rot)', 'poly2');
+                f = fit(xD_DC_rot_r', xD_DC_rot_i', 'poly2');
                 coeffvals1= coeffvalues(f);
                 coeffvals = [coeffvals coeffvals1(1)];
                 
@@ -157,7 +166,7 @@ elseif nargin == 2
                     fprintf('xwidth = %0.5f \n', Xwidth);
                     fprintf('Ywidth = %0.5f \n', Ywidth);
                     fprintf('Coef = %0.5f \n', coeffvals(end));
-                    polarplot(angle(xD_DC_rot),abs(xD_DC_rot)); title('Diagrama polar sinal original')
+                    polarplot(angle(xD_DC_rot)),abs(xD_DC_rot)); title('Diagrama polar sinal original')
                     pause;
                 end
                 
@@ -173,28 +182,28 @@ elseif nargin == 2
                     end
                 end
                 
-                % Atualiza condições while
+                % Atualiza condiï¿½ï¿½es while
                 cond1 = Xwidth > 0.01;
                 cond3 = Ywidth < Xwidth;
                 cond2 = bool;
                 
                 if qq3 == 10 & flag == 0            % Caso tenhamos dado 10 voltas e ainda nao tenhamos repetido a FASE 2
-                    fprintf('Ainda não foi possivel otimizar o arco\n');
+                    fprintf('Ainda nï¿½o foi possivel otimizar o arco\n');
                     cond1 = Xwidth > 0.03;          % Incrementar Xwidth permitido
                     flag = 1;                       % Ativa flag de repeticao FASE 2
-                    qq3 = 0;                        % Inicializa contador de rotações
+                    qq3 = 0;                        % Inicializa contador de rotaï¿½ï¿½es
                     bool = 0;
                     continue;                       % Repete FASE 2
-                elseif qq3 == 10 & flag == 1        % Caso já tenhamos repetido a FASE 2 uma vez
+                elseif qq3 == 10 & flag == 1        % Caso jï¿½ tenhamos repetido a FASE 2 uma vez
                     fprintf('NAO foi possivel otimizar o arco\n');
-                    break;                          % Avançamos para o offset
+                    break;                          % Avanï¿½amos para o offset
                 end
                 
             end
        
       %% FASE 3
             Q = angle(xD_DC_rot);                  
-            R = find( Q > rad | Q < - rad);         % Atualiza a condição QQ
+            R = find( Q > rad | Q < - rad);         % Atualiza a condiï¿½ï¿½o QQ
             offset = 1e-4;                          % Inicializa o offset
             
             % Aviso 2
@@ -202,17 +211,17 @@ elseif nargin == 2
                 fprintf('Iniciar offset\n');
             end
             
-            xlim_min = min(real(xD_DC_rot));        % Condição while xmin
+            xlim_min = min(real(xD_DC_rot));        % Condiï¿½ï¿½o while xmin
 
             while (xlim_min <= 0)                   % Enquanto houverem samples com x negativo
                 xD_DC_rot = xD_DC_rot + offset;     % Acrescenta offset
                 offset = offset + 1e-4;             % Incrementa offset
-                Q = angle(xD_DC_rot);               % Atualiza a condição QQ
-                R = find( Q > rad | Q < - rad);     % Atualiza a condição QQ
+                Q = angle(xD_DC_rot);               % Atualiza a condiï¿½ï¿½o QQ
+                R = find( Q > rad | Q < - rad);     % Atualiza a condiï¿½ï¿½o QQ
                 
                 xlim_min = min(real(xD_DC_rot));    % Atualiza a condicao while
                 
-                % Debug 4 - verificar em que ponto o arco pára de ter offset
+                % Debug 4 - verificar em que ponto o arco pï¿½ra de ter offset
                 if db_debug
                     polarplot(angle(xD_DC_rot),abs(xD_DC_rot))
                     pause;
@@ -222,32 +231,32 @@ elseif nargin == 2
     end
     
     %% Calculo da freq respiratoria
-    % Definição variaveis
-    fa2 = 100;                                      % Definição da freq. amostragem
-    resp = angle(xD_DC_rot) - mean(angle(xD_DC_rot));           % Sinal respiratório centrado em zero
+    % Definiï¿½ï¿½o variaveis
+    fa2 = 100;                                      % Definiï¿½ï¿½o da freq. amostragem
+    resp = angle(xD_DC_rot) - mean(angle(xD_DC_rot));           % Sinal respiratï¿½rio centrado em zero
     L = length(resp);                               % Tamanho do sinal
-    NFFT = 2^nextpow2(L);                           % Nº pontos FFT baseado no seu tamanho
+    NFFT = 2^nextpow2(L);                           % Nï¿½ pontos FFT baseado no seu tamanho
     % WELCH
-    [F1, F2] = pwelch(resp, [], [], NFFT, fa2);     % 1º calculo WELCH para retirar o vetor frequencias
-    F2i = linspace(F2(1),F2(end),length(F2));       % Criação vetor frequencias
-    p = pwelch(resp, [], [], NFFT, fa2);            % 2º calculo WELCH
-    % Interpolação
+    [F1, F2] = pwelch(resp, [], [], NFFT, fa2);     % 1ï¿½ calculo WELCH para retirar o vetor frequencias
+    F2i = linspace(F2(1),F2(end),length(F2));       % Criaï¿½ï¿½o vetor frequencias
+    p = pwelch(resp, [], [], NFFT, fa2);            % 2ï¿½ calculo WELCH
+    % Interpolaï¿½ï¿½o
     t_interp = linspace(min(F2i), max(F2i), 10*length(F2i));    % Vetor freq interpolado por 10
-    x_interp = interp1(F2i, p, t_interp, 'spline'); % Interpolação fator 10 com spline
+    x_interp = interp1(F2i, p, t_interp, 'spline'); % Interpolaï¿½ï¿½o fator 10 com spline
     % Procurar picos
     [PKS,LOCS] = findpeaks(x_interp,'SortStr','descend');       % Coloca os picos encontrados por ordem decrescente de magnitude
     
-    if t_interp(LOCS(1)) > 0.05 & t_interp(LOCS(1)) < 0.55      % Se o pico for maior que 0.05 não é DC e se for menor que 0.55 não houve erros
+    if t_interp(LOCS(1)) > 0.05 & t_interp(LOCS(1)) < 0.55      % Se o pico for maior que 0.05 nï¿½o ï¿½ DC e se for menor que 0.55 nï¿½o houve erros
         freq = t_interp(LOCS(1));                               % CNesse caso considerar o primeiro pico
         fprintf('[PWELCH]Frequencia detetada %0.2f Hz\n', freq);
-    elseif t_interp(LOCS(2)) > 0.05 & t_interp(LOCS(2)) < 0.55  % Se não for o primeiro pico, considera-se o segundo
+    elseif t_interp(LOCS(2)) > 0.05 & t_interp(LOCS(2)) < 0.55  % Se nï¿½o for o primeiro pico, considera-se o segundo
         freq = t_interp(LOCS(2));
         fprintf('[PWELCH]Frequencia detetada %0.2f Hz\n', freq);
-    else                                                        % Se não for o segundo pico usamos a FFT
+    else                                                        % Se nï¿½o for o segundo pico usamos a FFT
         % FFT
         f = fa2/2*linspace(0,1,NFFT/2+1);           % Eixo de frequencias para o plot
         test = fft(resp ,NFFT/2+1)/L;               % Calculo da FFT
-        % Interpolação
+        % Interpolaï¿½ï¿½o
         t_interp = linspace(min(f), max(f), 10*length(f));
         x_interp = interp1(f, test, t_interp, 'spline');
         % Procurar picos
@@ -256,7 +265,7 @@ elseif nargin == 2
         
         if freq > 0.05                              % Se o pico for maior que 0.05 nao e DC
             freq = (LOCS(1)/length(x_interp))*fa2;
-        else                                        % Se não, considera-se o segundo pico
+        else                                        % Se nï¿½o, considera-se o segundo pico
             freq = (LOCS(2)/length(x_interp))*fa2;
         end
         
@@ -265,4 +274,3 @@ elseif nargin == 2
     
 end
 end
-
