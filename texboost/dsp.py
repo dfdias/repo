@@ -114,8 +114,19 @@ class dsp :
             
             if debug:
                 plt.polar(np.angle(x_rot),np.abs(x_rot))
-    return 0            
+        return 0            
+
+    def rate_calc(x,fa):
+        angle = np.angle(x)
+        resp = angle - np.mean(angle)
+        L = len(resp)
+        nfft = np.ceil(np.log2(np.abs(L))) #nextpow2
+        sp.signal.welch(resp,[],[],nfft=nfft,fs=fa)
+    
+
+        
+        
+        return rate
 
 
-               
     
