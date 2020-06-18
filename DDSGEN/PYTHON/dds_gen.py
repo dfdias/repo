@@ -28,7 +28,7 @@ class dds_gen:
         x = np.zeros(NumSamp-1)
         sintable = self.sintable
         IncPhase = (f0/self.fs)*N 
-        n = 0;
+        n = 0
         phi = self.IniPhase
         for n in range(NumSamp-1) :
             x[n] = sintable[int(np.round(phi))]

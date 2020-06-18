@@ -141,7 +141,7 @@ elseif nargin == 2
             fprintf('stage2\n');  % as 8, 9 ou 10 de julhoond2             % Enquanto se verificarem as condi��es
             while cond1 | cond3 | cond2             % Enquanto se verificarem as condi��es
 
-                aux = exp(-1j*(pi/5));              % Sinal auxilixar para rodar
+               % aux = exp(-1j*(pi/5));              % Sinal auxilixar para rodar
                 xD_DC_rot = aux*xD_DC_rot;          % Roda pi/5
                 xD_DC_rot_i = imag(xD_DC_rot);
                 xD_DC_rot_r = real(xD_DC_rot);
