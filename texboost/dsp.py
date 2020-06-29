@@ -11,14 +11,14 @@ class dsp :
             x => input vector
             debug => toggles plots (bool)
         """
-        xrot = x
+        x_rot = x
         Q = np.angle(x)
         rad = (6*np.pi)/8;
         R = np.find(Q > rad or Q < -rad)
         qq1 = 0;
 
         while (R.len() != 0) :
-            aux = np.exp(-j*(np.pi/5))
+            aux = np.exp(-1j*(np.pi/5))
             x_rot = aux * x
             x_rot_i = np.imag(x_rot)
             x_rot_r = np.real(x_rot)
@@ -54,7 +54,7 @@ class dsp :
                 cond1 = x_width > 0.01
                 bool = 1;
                 cond2 = True
-                cond3 = Ywidth < Xwidth
+                cond3 = y_width < x_width
                 print('stage2 \n')
                 while cond1 or cond3 or cond2 :
                     x_rot = x_rot*aux
@@ -116,16 +116,22 @@ class dsp :
                 plt.polar(np.angle(x_rot),np.abs(x_rot))
         return 0            
 
-    def rate_calc(x,fa):
+    def rate_calc(self,x,fa):
         angle = np.angle(x)
         resp = angle - np.mean(angle)
         L = len(resp)
         nfft = np.ceil(np.log2(np.abs(L))) #nextpow2
-        sp.signal.welch(resp,[],[],nfft=nfft,fs=fa)
-    
-
+        A = sp.signal.welch(resp,[],[],nfft=nfft,fs=fa)
+        F1 = A[0]
+        F2 = A[1]
+        F2i = np.linspace(F2[0],F2[len(F2)-1],len(F2)) 
+        p = sp.signal(resp,[],[],nfft,fa)
+        t_interp = np.linspace(np.min(F2i),np.max(F2i),10*len(F2i))
+        x_interp = sp.interpolate.interp1d(F2i,p,t_interp,s=0);
+        #Inter
         
         
+        rate = 0
         return rate
 
 
