@@ -121,12 +121,52 @@ class dsp :
         resp = angle - np.mean(angle)
         L = len(resp)
         nfft = np.ceil(np.log2(np.abs(L))) #nextpow2
-        sp.signal.welch(resp,[],[],nfft=nfft,fs=fa)
-    
-
-        
-        
+        F1, F2 = sp.signal.welch(resp,window=[],noverlap=[],nfft=10*nfft,fs=fa)
+        F2i = np.linspace(F2[0],F2[len(F2)-1],len(F2))
+        p = sp.signal.welch(resp,window=[],noverlap=[],nfft=nfft,fs=fa2)    
+        t_interp = np.linspace(np.min(F2i),np.max(F2i),10*len(F2i));
+        x_interp = F2i
+        locs,peaks = sp.signal.find_peaks(F2i,'peak_heights')
+        locs, peaks = sort_peaks(locs,peaks) #sorting peaks 
+        if t_interp(locs[0]) > 0.05 & t_interp(locs[0]) < 0.55:
+            freq = t_interp(locs[0])        
+            break;
+        elif t_interp(locs[1]) > 0.05 & t_interp(locs[1]) <0.55:
+            freq = t_interp(locs(2));
+        else :
+            f = fa/2*linspace(0,1,(nftt*10)/2+1)
+            test = sp.signal.fft(resp,nfft*10/2 +1)/L
+            t_interp = linspace(min(f),max(f),10*len(nfft))
+            x_interp = test
+            locs, peaks = find_peaks(np.abs(x_interp[1:(10*nfft/2+1)])]
+            locs, peaks = sort_peaks(locs,peaks)
+            freq = (locs[0]/len(x_interp))*fa
+            if freq > 0.05:
+                freq = (locs[0]/len(x_interp))*fa
+            else :
+                freq = (locs[1]/len(x_interp))*fa
+        rate = freq
+        print("frequência detetada : ",rate, " Hz\n");
         return rate
 
+    def sort_peaks(self,locs,peaks):
+        aux_locs = 0 ;
+        aux_peaks = 0;
+        for i in range(0,len(locs)-1):
+            if peaks[i] < peaks[i+1]
+                aux_peaks = peaks[i]
+                aux_locs = locs[i]
+                peaks[i] = peaks[i+1]
+                locs[i] = locs[i+1]
+                peaks[i+1] = aux_peaks
+                locs[i+1] = aux_locs
+    return locs,peaks
+                     
 
-    
+    def circfit(self,x,y):
+        a = [x y np.ones(lenx(x))]\[-(np.exp2(x)+np.exp2(y))]
+        xc = -0.5*a[0]
+        yc = -0.5*a[1]
+        R = np.sqrt(np.exp2(a[0])+np.exp2(a[1])/(4-a[2])
+
+        return xc,yc,R,a
